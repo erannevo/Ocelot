@@ -1,23 +1,40 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Ocelot.Configuration.File;
-using Ocelot.Provider.Polly;
+using Ocelot.Testing.Steps;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 
 namespace Ocelot.AcceptanceTests.QualityOfService;
 
-public class QosSteps : Steps, IQosSteps
+public class QosSteps : TimeoutSteps
 {
-    private readonly Steps self;
-    public QosSteps(Steps self) => this.self = self;
+    protected AcceptanceSteps self;
+    public QosSteps() => this.self = this;
+    public QosSteps(AcceptanceSteps self) => this.self = self;
+
+    /// <summary>
+    /// Copied from Polly project aka the PollyQoSResiliencePipelineProvider class.
+    /// </summary>
+    public static readonly IReadOnlySet<HttpStatusCode> DefaultServerErrorCodes = new HashSet<HttpStatusCode>()
+    {
+        HttpStatusCode.InternalServerError,
+        HttpStatusCode.NotImplemented,
+        HttpStatusCode.BadGateway,
+        HttpStatusCode.ServiceUnavailable,
+        HttpStatusCode.GatewayTimeout,
+        HttpStatusCode.HttpVersionNotSupported,
+        HttpStatusCode.VariantAlsoNegotiates,
+        HttpStatusCode.InsufficientStorage,
+        HttpStatusCode.LoopDetected,
+    };
 
     public async Task TestRouteCircuitBreaker(int[] ports, string upstreamPath, FileQoSOptions qos, int index = 0, bool isDiscovery = false)
     {
         qos ??= new();
         await handler.ReleasePortAsync(ports)
             .ContinueWith(t => self.ReleasePortAsync(ports));
-        int count = PollyQoSResiliencePipelineProvider.DefaultServerErrorCodes.Count;
-        HttpStatusCode[] codes = PollyQoSResiliencePipelineProvider.DefaultServerErrorCodes.ToArray();
+        int count = DefaultServerErrorCodes.Count;
+        HttpStatusCode[] codes = DefaultServerErrorCodes.ToArray();
         HttpStatusCode nextBadStatus = codes[DateTime.Now.Millisecond % count];
         for (int i = 0; i < ports.Length; i++)
         {
@@ -108,14 +125,6 @@ public class QosSteps : Steps, IQosSteps
                 BrokenServiceStatusCode[kv.Key] = onlineStatusCode;
         }
     }
-}
 
-public interface IQosSteps
-{
-    Task TestRouteCircuitBreaker(int[] ports, string upstreamPath, FileQoSOptions qos, int index = 0, bool isDiscovery = false);
-    Task TestRouteTimeout(int[] ports, string upstreamPath, FileQoSOptions qos);
-    void GivenThereIsAServiceRunningOn(int port, HttpStatusCode statusCode,
-        Func<int> timeoutStrategy, Func<bool> failingStrategy, [CallerMemberName] string response = null);
-    void GivenThereIsABrokenServiceRunningOn(int port, HttpStatusCode brokenStatusCode, int index = 0);
-    void GivenThereIsABrokenServiceOnline(HttpStatusCode onlineStatusCode, int index = 0, int length = 1, bool isDiscovery = false);
+    public override CancellationToken CancelMe => Xunit.TestContext.Current.CancellationToken;
 }

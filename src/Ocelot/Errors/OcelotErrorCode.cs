@@ -2,8 +2,8 @@
 
 public enum OcelotErrorCode
 {
-    UnauthenticatedError = 0,
-    UnknownError = 1,
+    UnknownError = 0,
+    UnauthenticatedError = 1,
     DownstreampathTemplateAlreadyUsedError = 2,
     UnableToFindDownstreamRouteError = 3,
     CannotAddDataError = 4,
@@ -44,4 +44,5 @@ public enum OcelotErrorCode
     CouldNotFindLoadBalancerCreator = 39,
     ErrorInvokingLoadBalancerCreator = 40,
     PayloadTooLargeError = 41,
+    BadRequestError = 42,
 }

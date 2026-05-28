@@ -109,7 +109,7 @@ public class FileConfigurationFluentValidatorTests : UnitTest
         // Assert
         ThenTheResultIsNotValid();
         ThenTheErrorIs<FileValidationFailedError>();
-        ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?");
+        ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Discovery.Consul and services.AddConsul() or Ocelot.Discovery.Eureka and services.AddEureka()?");
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class FileConfigurationFluentValidatorTests : UnitTest
         // Assert
         ThenTheResultIsNotValid();
         ThenTheErrorIs<FileValidationFailedError>();
-        ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?");
+        ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Discovery.Consul and services.AddConsul() or Ocelot.Discovery.Eureka and services.AddEureka()?");
     }
 
     [Fact]
@@ -147,7 +147,7 @@ public class FileConfigurationFluentValidatorTests : UnitTest
         // Assert
         ThenTheResultIsNotValid();
         ThenTheErrorIs<FileValidationFailedError>();
-        ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Consul and services.AddConsul() or Ocelot.Provider.Eureka and services.AddEureka()?");
+        ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot, errors are: Unable to start Ocelot because either a Route or GlobalConfiguration are using ServiceDiscoveryOptions but no ServiceDiscoveryFinderDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Discovery.Consul and services.AddConsul() or Ocelot.Discovery.Eureka and services.AddEureka()?");
     }
 
     [Fact]
@@ -198,8 +198,8 @@ public class FileConfigurationFluentValidatorTests : UnitTest
         var route = GivenDefaultRoute("/laura", "/", key: "Laura");
         route.QoSOptions = new FileQoSOptions
         {
-            TimeoutValue = 1,
-            ExceptionsAllowedBeforeBreaking = 1,
+            Timeout = 1,
+            MinimumThroughput = 1,
         };
         GivenAConfiguration(route);
 
@@ -209,7 +209,7 @@ public class FileConfigurationFluentValidatorTests : UnitTest
         // Assert
         ThenTheResultIsNotValid();
         ThenTheErrorIs<FileValidationFailedError>();
-        ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot because either a Route or GlobalConfiguration are using QoSOptions but no QosDelegatingHandlerDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Polly and services.AddPolly()?");
+        ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot because either a Route or GlobalConfiguration is using QoSOptions, but no QosDelegatingHandlerDelegate has been registered in the dependency injection container. Are you missing an external package like Ocelot.QualityOfService.Polly (and calling AddPolly()), or the built-in QoS support (via AddQualityOfService())?");
     }
 
     [Fact]
@@ -220,8 +220,8 @@ public class FileConfigurationFluentValidatorTests : UnitTest
         var configuration = GivenAConfiguration(route);
         configuration.GlobalConfiguration.QoSOptions = new()
         {
-            TimeoutValue = 1,
-            ExceptionsAllowedBeforeBreaking = 1,
+            Timeout = 1,
+            MinimumThroughput = 1,
         };
         GivenAConfiguration(configuration);
 
@@ -231,7 +231,7 @@ public class FileConfigurationFluentValidatorTests : UnitTest
         // Assert
         ThenTheResultIsNotValid();
         ThenTheErrorIs<FileValidationFailedError>();
-        ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot because either a Route or GlobalConfiguration are using QoSOptions but no QosDelegatingHandlerDelegate has been registered in dependency injection container. Are you missing a package like Ocelot.Provider.Polly and services.AddPolly()?");
+        ThenTheErrorMessageAtPositionIs(0, "Unable to start Ocelot because either a Route or GlobalConfiguration is using QoSOptions, but no QosDelegatingHandlerDelegate has been registered in the dependency injection container. Are you missing an external package like Ocelot.QualityOfService.Polly (and calling AddPolly()), or the built-in QoS support (via AddQualityOfService())?");
     }
 
     [Fact]

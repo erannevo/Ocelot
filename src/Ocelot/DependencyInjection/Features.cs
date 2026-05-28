@@ -3,9 +3,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Ocelot.Cache;
 using Ocelot.Configuration.Creator;
 using Ocelot.Configuration.File;
+using Ocelot.Configuration.Repository;
 using Ocelot.Configuration.Validator;
 using Ocelot.DownstreamRouteFinder.HeaderMatcher;
 using Ocelot.Logging;
+using Ocelot.QualityOfService;
 using Ocelot.RateLimiting;
 
 namespace Ocelot.DependencyInjection;
@@ -23,6 +25,16 @@ public static class Features
         .AddSingleton<FileGlobalConfigurationFluentValidator>()
         .AddSingleton<FileQoSOptionsFluentValidator>()
         .AddSingleton<FileAuthenticationOptionsValidator>();
+
+    /// <summary>
+    /// Adds Ocelot Configuration Repository feature without Configuration Poller (the <see cref="FileConfigurationPoller"/> class).
+    /// </summary>
+    /// <param name="services">The services collection to add the feature to.</param>
+    /// <returns>The same <see cref="IServiceCollection"/> object.</returns>
+    public static IServiceCollection AddOcelotConfigurationRepository(this IServiceCollection services) => services
+        .AddSingleton<IFileConfigurationRepository, DiskFileConfigurationRepository>()
+        .AddSingleton<IFileConfigurationSetter, FileAndInternalConfigurationSetter>()
+        .AddSingleton<IInternalConfigurationRepository, InMemoryInternalConfigurationRepository>();
 
     /// <summary>
     /// Ocelot feature: <see href="https://github.com/ThreeMammals/Ocelot/blob/develop/docs/features/ratelimiting.rst">Rate Limiting</see>.
@@ -74,4 +86,7 @@ public static class Features
     /// <returns>The same <see cref="IServiceCollection"/> object.</returns>
     public static IServiceCollection AddOcelotMetadata(this IServiceCollection services) => 
         services.AddSingleton<IMetadataCreator, DefaultMetadataCreator>();
+
+    public static IServiceCollection AddOcelotQualityOfService(this IServiceCollection services) => services
+        .AddSingleton<IQualityOfServiceFactory, QualityOfServiceFactory>();
 }
